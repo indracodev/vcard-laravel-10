@@ -1,0 +1,15 @@
+:root,
+[data-bs-theme="light"] {
+   --bs-border-color: color-mix(in srgb, var(--bs-body-color) 50%, transparent);
+   --bs-border-color-translucent: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] {
+   --bs-border-color: color-mix(in srgb, var(--bs-body-color) 25%, transparent);
+   --bs-border-color-translucent: var(--bs-border-color);
+}
+
+hr {
+   border-top: solid 1px var(--bs-border-color);
+   opacity: 1;
+}
