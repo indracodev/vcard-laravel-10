@@ -67,7 +67,8 @@
                      <input type="password" name="password" id="password" class="form-control" placeholder="Password"
                         autocomplete="current-password" required>
                      <button type="button" class="btn btn-outline-secondary" id="togglePassword"
-                        aria-label="Tampilkan kata sandi" aria-pressed="false" title="Tampilkan kata sandi">
+                        aria-label="Tampilkan kata sandi" aria-pressed="false" aria-controls="password"
+                        title="Tampilkan kata sandi">
                         <i class="bi bi-eye" id="togglePasswordIcon" aria-hidden="true"></i>
                      </button>
                   </div>
@@ -80,7 +81,7 @@
             </form>
          </div>
          <div class="card-footer text-center small text-muted">
-            Dikembangkan dengan ❤️ oleh INDRACODEV. &copy; {{ date('Y') }} {{ config('app.name') }}. Seluruh hak
+            Dikembangkan dengan <span role="img" aria-label="cinta">❤️</span> oleh INDRACODEV. &copy; {{ date('Y') }} {{ config('app.name') }}. Seluruh hak
             dilindungi.
          </div>
       </div>

@@ -3,7 +3,7 @@
    Dashboard
 @endsection
 @section('content')
-   <section aria-label="hero banner" style="padding: 125px 0;">
+   <section aria-label="Sambutan utama" style="padding: 125px 0;">
       <div class="container-fluid px-lg-4 px-xxl-5">
          <div class="page-title text-center mx-auto" style="max-width: 640px;">
             <h1 class="display-5 fw-bold mb-0">
@@ -14,7 +14,7 @@
                {{ config('app.name') }}.
             </p>
             <a href="#vcard-list" class="btn btn-primary bg-gradient">
-               Kelola Sekarang <i class="bi bi-chevron-right"></i>
+               Kelola Sekarang <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </a>
          </div>
       </div>
@@ -36,6 +36,7 @@
                         <div class="col col-12 col-md">
                            <form id="searchForm" class="input-group" method="GET" action="{{ route('dashboard') }}"
                               role="search">
+                              <label for="searchInput" class="visually-hidden">Cari vCard</label>
                               <span class="input-group-text">
                                  <i class="bi bi-search" aria-hidden="true"></i>
                               </span>
@@ -64,7 +65,8 @@
                      <small>Belum ada data vCard yang ditemukan.</small>
                   </div>
                @else
-                  <div id="searchEmptyState" class="alert alert-danger p-5 fs-5 text-center d-none" role="alert">
+                  <div id="searchEmptyState" class="alert alert-danger p-5 fs-5 text-center d-none" role="alert"
+                     aria-live="polite">
                      <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>
                      <span>Tidak ada data vCard yang cocok dengan pencarian Anda.</span>
                   </div>
@@ -101,7 +103,7 @@
                                     @endif
                                     <a href="{{ url($v->link_name) }}" target="_blank" rel="noopener noreferrer"
                                        class="stretched-link">
-                                       <span class="visually-hidden">{{ $v->link_name }}</span>
+                                       <span class="visually-hidden">Lihat profil vCard {{ $v->full_name }}</span>
                                     </a>
                                  </div>
 
@@ -111,7 +113,7 @@
                                  <p class="mb-2 small">{{ $formattedPhone }}</p>
                                  <div>
                                     <span class="badge rounded-pill {{ $v->status->badgeClass() }}">
-                                       {{ $v->status->label() }}
+                                       <span class="visually-hidden">Status: </span>{{ $v->status->label() }}
                                     </span>
                                  </div>
 
@@ -123,15 +125,17 @@
                                     data-mobile_phone="{{ $v->mobile_phone }}" data-link_name="{{ $v->link_name }}"
                                     data-photo="{{ $v->photo }}" data-photo-url="{{ $photoUrl ?? '' }}"
                                     data-status="{{ $v->status->value }}" data-bs-toggle="modal"
-                                    data-bs-target="#vcardModal" title="Edit Vcard">
+                                    data-bs-target="#vcardModal" aria-label="Edit vCard {{ $v->full_name }}"
+                                    title="Edit vCard {{ $v->full_name }}">
                                     <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                                    <span class="visually-hidden">Edit</span>
+                                    <span class="visually-hidden">Edit vCard {{ $v->full_name }}</span>
                                  </button>
 
                                  <span
                                     class="py-1 px-2 position-absolute top-0 start-0 m-2 d-inline-flex align-items-center gap-1"
                                     title="Jumlah dilihat">
                                     <i class="bi bi-eye" aria-hidden="true"></i>
+                                    <span class="visually-hidden">Jumlah dilihat: </span>
                                     <span>{{ $v->views }}</span>
                                  </span>
 
@@ -152,7 +156,7 @@
 @push('modals')
    {{-- Modal Form --}}
    <div id="vcardModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-      aria-labelledby="vcardModalLabel" aria-hidden="true">
+      role="dialog" aria-modal="true" aria-labelledby="vcardModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-fullscreen-md-down modal-dialog-centered modal-dialog-scrollable">
          <form id="vcardForm" class="modal-content" method="POST" enctype="multipart/form-data">
             @csrf
@@ -165,7 +169,8 @@
             </div>
 
             <div class="modal-body d-flex flex-column row-gap-3">
-               <div id="formGeneralError" class="alert alert-danger small d-none mb-0" role="alert"></div>
+               <div id="formGeneralError" class="alert alert-danger small d-none mb-0" role="alert"
+                  aria-live="assertive"></div>
 
                <div class="form-group">
                   <div id="editPhoto"
@@ -179,11 +184,11 @@
                </div>
                <div class="form-group">
                   <label for="name" class="form-label small">Nama Panggilan / Singkat</label>
-                  <input type="text" name="name" id="name" class="form-control" required>
+                  <input type="text" name="name" id="name" class="form-control" autocomplete="nickname" required>
                </div>
                <div class="form-group">
                   <label for="full_name" class="form-label small">Nama Lengkap</label>
-                  <input type="text" name="full_name" id="full_name" class="form-control" required>
+                  <input type="text" name="full_name" id="full_name" class="form-control" autocomplete="name" required>
                </div>
                <div class="form-group">
                   <label for="status" class="form-label small">Status</label>
@@ -195,20 +200,21 @@
                </div>
                <div class="form-group">
                   <label for="title" class="form-label small">Jabatan</label>
-                  <input type="text" name="title" id="title" class="form-control" required>
+                  <input type="text" name="title" id="title" class="form-control" autocomplete="organization-title"
+                     required>
                </div>
                <div class="form-group">
                   <label for="email" class="form-label small">Email</label>
-                  <input type="email" name="email" id="email" class="form-control" required>
+                  <input type="email" name="email" id="email" class="form-control" autocomplete="email" required>
                </div>
                <div class="form-group">
                   <label for="mobile_phone" class="form-label small">Nomor HP</label>
                   <input type="text" name="mobile_phone" id="mobile_phone" class="form-control"
-                     placeholder="+62 812 3456 7890" required>
+                     placeholder="+62 812 3456 7890" autocomplete="tel" required>
                </div>
                <div class="form-group">
                   <label for="link_name" class="form-label small">Link Name</label>
-                  <input type="text" name="link_name" id="link_name" class="form-control" required>
+                  <input type="text" name="link_name" id="link_name" class="form-control" autocomplete="off" required>
                </div>
             </div>
 
@@ -397,6 +403,10 @@
 
          const clearErrors = () => {
             document.querySelectorAll('.field-error').forEach(el => el.remove());
+            form.querySelectorAll('[aria-invalid="true"]').forEach(input => {
+               input.removeAttribute('aria-invalid');
+               input.removeAttribute('aria-describedby');
+            });
             generalError.classList.add('d-none');
             generalError.innerText = '';
          };
@@ -484,10 +494,15 @@
                      Object.keys(data.errors).forEach(key => {
                         const input = form.querySelector(`[name="${key}"]`);
                         if (input) {
+                           const errorId = `error-${key}`;
                            const errorEl = document.createElement('div');
+                           errorEl.id = errorId;
+                           errorEl.setAttribute('role', 'alert');
                            errorEl.classList.add('text-danger', 'small', 'mt-1', 'field-error');
                            errorEl.innerText = Array.isArray(data.errors[key]) ? data.errors[key][0] :
                               data.errors[key];
+                           input.setAttribute('aria-invalid', 'true');
+                           input.setAttribute('aria-describedby', errorId);
                            input.insertAdjacentElement('afterend', errorEl);
                         }
                      });

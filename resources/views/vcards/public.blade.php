@@ -18,20 +18,20 @@
 
 <body>
    <div class="wrapper bg-body shadow position-relative mx-auto">
-      <div class="position-absolute top-0 end-0 p-3">
-         @include('layouts.partials.themeSwitcher')
-      </div>
       <header class="px-4 py-5 p-sm-5 vstack row-gap-5">
+         <div class="position-absolute top-0 end-0 p-3">
+            @include('layouts.partials.themeSwitcher')
+         </div>
          <img src="{{ asset('assets/img/logo-indraco-dark.png') }}"
             data-img-theme-light="{{ asset('assets/img/logo-indraco.png') }}"
-            data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}" width="45%" height="auto"
-            alt="Logo INDRACO" loading="lazy" class="mx-auto">
+            data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}"
+            alt="Logo INDRACO" loading="lazy" class="mx-auto" style="width: 45%; height: auto;">
          <div class="ratio ratio-1x1 rounded-circle overflow-hidden mx-auto bg-secondary" style="width:60%;">
             @if ($vcard->photo_url)
                <img src="{{ $vcard->photo_url }}" alt="Foto {{ $vcard->full_name }}"
-                  loading="lazy" width="100%" height="100%" class="object-fit-cover">
+                  loading="lazy" class="w-100 h-100 object-fit-cover">
             @else
-               <img src="{{ asset('assets/img/no-image-invert.png') }}" alt="Avatar Default" loading="lazy"
+               <img src="{{ asset('assets/img/no-image-invert.png') }}" alt="Avatar default {{ $vcard->full_name }}" loading="lazy"
                   class="w-50 h-50 top-50 start-50 translate-middle">
             @endif
          </div>
@@ -47,7 +47,7 @@
          </div>
       </header>
       <main>
-         <nav aria-label="header navigation" class="navtop">
+         <nav aria-label="Tautan cepat" class="navtop">
             <ul class="list-unstyled mb-0 hlist-divider d-grid" style="grid-template-columns: repeat(3, 1fr);">
                <li>
                   <a href="https://www.indracoglobal.com/download" target="_blank" rel="noopener noreferrer"
@@ -72,7 +72,7 @@
          </nav>
 
          <div class="p-4 py-5 p-sm-5">
-            <nav aria-label="main navigation">
+            <nav aria-label="Informasi kontak">
                <ul class="list-unstyled m-0 d-flex flex-column row-gap-4 py-sm-4">
                   <li class="d-flex column-gap-3">
                      <i class="bi bi-phone fs-5 d-grid lh-1" aria-hidden="true"></i>
@@ -130,8 +130,8 @@
             <div>
                <img src="{{ asset('assets/img/logo-indraco.png') }}"
                   data-img-theme-light="{{ asset('assets/img/logo-indraco.png') }}"
-                  data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}" width="100%"
-                  height="auto" alt="Logo INDRACO" loading="lazy" style="max-width: 248px">
+                  data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}"
+                  alt="Logo INDRACO" loading="lazy" class="w-100 h-auto" style="max-width: 248px">
                <p class="text-capitalize mb-0 fs-small">
                   <span>Roasting fine exquisite coffee since 1971.</span>
                </p>
@@ -199,7 +199,7 @@
             <div>
                <h2 class="fw-bold fs-6 mb-3">Contact Us</h2>
                <address class="fs-small mb-0">
-                  <b>PT. Indraco Global Indonesia</b>
+                  <strong>PT. Indraco Global Indonesia</strong>
                   <br>
                   Jl. Semeru No. 133-135 Bambe, Kec. Driyorejo,
                   <br>

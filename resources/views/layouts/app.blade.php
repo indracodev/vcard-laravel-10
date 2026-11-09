@@ -21,7 +21,7 @@
       <nav class="navbar navbar-expand bg-primary-subtle bg-gradient border-bottom shadow" aria-label="Navigasi utama">
          <div class="container-fluid flex-wrap column-gap-2 text-nowrap">
 
-            <a class="navbar-brand d-flex" href="{{ route('dashboard') }}">
+            <a class="navbar-brand d-flex" href="{{ route('dashboard') }}" aria-label="Beranda Dashboard {{ config('app.name') }}">
                <img src="{{ asset('assets/img/logo-indraco.png') }}"
                   data-img-theme-light="{{ asset('assets/img/logo-indraco.png') }}"
                   data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}" alt="Logo INDRACO"
@@ -49,7 +49,7 @@
       <div class="container-fluid px-lg-4 px-xxl-5">
          <hr>
          <p class="small text-center text-muted mb-0">
-            Dikembangkan dengan ❤️ oleh INDRACODEV. &copy; {{ date('Y') }} {{ config('app.name') }}. Seluruh hak
+            Dikembangkan dengan <span role="img" aria-label="cinta">❤️</span> oleh INDRACODEV. &copy; {{ date('Y') }} {{ config('app.name') }}. Seluruh hak
             dilindungi.
          </p>
       </div>

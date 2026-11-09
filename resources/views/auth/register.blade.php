@@ -101,7 +101,7 @@
             </p>
          </div>
          <div class="card-footer text-center small text-muted">
-            Dikembangkan dengan ❤️ oleh INDRACODEV. &copy; {{ date('Y') }} {{ config('app.name') }}. Seluruh hak
+            Dikembangkan dengan <span role="img" aria-label="cinta">❤️</span> oleh INDRACODEV. &copy; {{ date('Y') }} {{ config('app.name') }}. Seluruh hak
             dilindungi.
          </div>
       </div>
