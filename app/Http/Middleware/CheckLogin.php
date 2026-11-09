@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckLogin
 {
+    private const IDLE_TIMEOUT_SECONDS = 300;
+
     /**
      * Handle an incoming request.
      *
@@ -24,6 +26,25 @@ class CheckLogin
         if (! Auth::check() && ! Session::get('login')) {
             return redirect('/login');
         }
+
+        $lastActivity = Session::get('last_activity_at');
+        if ($lastActivity && (time() - (int) $lastActivity) > self::IDLE_TIMEOUT_SECONDS && ! $request->routeIs('logout')) {
+            Auth::logout();
+            Session::flush();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['general' => ['Sesi Anda telah berakhir karena tidak ada aktivitas selama 5 menit.']],
+                ], 401);
+            }
+
+            return redirect('/login')->with('error', 'Sesi Anda telah berakhir secara otomatis karena tidak ada aktivitas selama 5 menit.');
+        }
+
+        Session::put('last_activity_at', time());
 
         return $next($request);
     }

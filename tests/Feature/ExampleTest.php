@@ -47,4 +47,15 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_session_expires_after_five_minutes_of_inactivity(): void
+    {
+        $response = $this->withSession([
+            'login' => true,
+            'role' => 'admin',
+            'last_activity_at' => time() - 301,
+        ])->get('/dashboard');
+
+        $response->assertRedirect('/login');
+    }
 }

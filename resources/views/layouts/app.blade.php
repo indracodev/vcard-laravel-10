@@ -21,7 +21,8 @@
       <nav class="navbar navbar-expand bg-primary-subtle bg-gradient border-bottom shadow" aria-label="Navigasi utama">
          <div class="container-fluid flex-wrap column-gap-2 text-nowrap">
 
-            <a class="navbar-brand d-flex" href="{{ route('dashboard') }}" aria-label="Beranda Dashboard {{ config('app.name') }}">
+            <a class="navbar-brand d-flex" href="{{ route('dashboard') }}"
+               aria-label="Beranda Dashboard {{ config('app.name') }}">
                <img src="{{ asset('assets/img/logo-indraco.png') }}"
                   data-img-theme-light="{{ asset('assets/img/logo-indraco.png') }}"
                   data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}" alt="Logo INDRACO"
@@ -45,8 +46,9 @@
                      </a>
                   @endif
                @endif
-               <form action="{{ route('logout') }}" method="POST" class="m-0">
+               <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="m-0">
                   @csrf
+                  <input type="hidden" name="idle" id="logoutIdleInput" value="0">
                   <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-2 bg-gradient">
                      <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                      <span>LOGOUT</span>
@@ -64,7 +66,8 @@
       <div class="container-fluid px-lg-4 px-xxl-5">
          <hr>
          <p class="small text-center text-muted mb-0">
-            Dikembangkan dengan <span role="img" aria-label="cinta">❤️</span> oleh INDRACODEV. &copy; {{ date('Y') }} {{ config('app.name') }}. Seluruh hak
+            Dikembangkan dengan <span role="img" aria-label="cinta">❤️</span> oleh INDRACODEV. &copy;
+            {{ date('Y') }} <strong>{{ config('app.name') }}</strong>. Seluruh hak
             dilindungi.
          </p>
       </div>
@@ -72,6 +75,36 @@
 
    @stack('modals')
    @stack('scripts')
+   <script>
+      document.addEventListener('DOMContentLoaded', function() {
+         const logoutForm = document.getElementById('logoutForm');
+         const logoutIdleInput = document.getElementById('logoutIdleInput');
+         if (!logoutForm) return;
+
+         const IDLE_TIMEOUT_MS = 5 * 60 * 1000;
+         let idleTimer = null;
+
+         const triggerIdleLogout = () => {
+            if (logoutIdleInput) {
+               logoutIdleInput.value = '1';
+            }
+            logoutForm.submit();
+         };
+
+         const resetIdleTimer = () => {
+            if (idleTimer) clearTimeout(idleTimer);
+            idleTimer = setTimeout(triggerIdleLogout, IDLE_TIMEOUT_MS);
+         };
+
+         ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(eventName => {
+            window.addEventListener(eventName, resetIdleTimer, {
+               passive: true
+            });
+         });
+
+         resetIdleTimer();
+      });
+   </script>
 </body>
 
 </html>

@@ -115,7 +115,7 @@
                                           <i class="bi bi-pencil-square" aria-hidden="true"></i>
                                           <span>Edit</span>
                                        </button>
-                                       @if (! $isSelf)
+                                       @if (!$isSelf)
                                           <button type="button" class="btn btn-sm btn-outline-danger btnDeleteUser"
                                              data-delete-url="{{ route('users.destroy', $u->id) }}"
                                              data-name="{{ $u->name }}" aria-label="Hapus akun {{ $u->name }}"
@@ -138,8 +138,8 @@
    </section>
 @endsection
 @push('modals')
-   <div id="userModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-      role="dialog" aria-modal="true" aria-labelledby="userModalLabel" aria-hidden="true">
+   <div id="userModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog"
+      aria-modal="true" aria-labelledby="userModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-fullscreen-md-down modal-dialog-centered modal-dialog-scrollable">
          <form id="userForm" class="modal-content" method="POST">
             @csrf
@@ -183,8 +183,8 @@
                </div>
                <div class="form-group">
                   <label for="userPasswordConfirmation" class="form-label small">Konfirmasi Password</label>
-                  <input type="password" name="password_confirmation" id="userPasswordConfirmation" class="form-control"
-                     autocomplete="new-password">
+                  <input type="password" name="password_confirmation" id="userPasswordConfirmation"
+                     class="form-control" autocomplete="new-password">
                </div>
             </div>
 
@@ -308,7 +308,8 @@
                      if (data.success) {
                         location.reload();
                      } else if (data.errors && data.errors.general) {
-                        alert(Array.isArray(data.errors.general) ? data.errors.general[0] : data.errors.general);
+                        alert(Array.isArray(data.errors.general) ? data.errors.general[0] : data
+                           .errors.general);
                      }
                   })
                   .catch(() => {
@@ -350,7 +351,8 @@
 
                   if (data.errors) {
                      if (data.errors.general) {
-                        generalError.innerText = Array.isArray(data.errors.general) ? data.errors.general[0] : data.errors.general;
+                        generalError.innerText = Array.isArray(data.errors.general) ? data.errors.general[
+                           0] : data.errors.general;
                         generalError.classList.remove('d-none');
                      }
 
@@ -362,7 +364,8 @@
                            errorEl.id = errorId;
                            errorEl.setAttribute('role', 'alert');
                            errorEl.classList.add('text-danger', 'small', 'mt-1', 'field-error');
-                           errorEl.innerText = Array.isArray(data.errors[key]) ? data.errors[key][0] : data.errors[key];
+                           errorEl.innerText = Array.isArray(data.errors[key]) ? data.errors[key][0] :
+                              data.errors[key];
                            input.setAttribute('aria-invalid', 'true');
                            input.setAttribute('aria-describedby', errorId);
                            input.insertAdjacentElement('afterend', errorEl);
@@ -384,4 +387,3 @@
       });
    </script>
 @endpush
-
