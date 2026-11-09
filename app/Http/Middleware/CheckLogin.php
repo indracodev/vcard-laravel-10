@@ -17,6 +17,10 @@ class CheckLogin
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (! Auth::check() && Session::get('login') && Session::get('user_id')) {
+            Auth::loginUsingId(Session::get('user_id'));
+        }
+
         if (! Auth::check() && ! Session::get('login')) {
             return redirect('/login');
         }

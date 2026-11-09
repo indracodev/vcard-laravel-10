@@ -21,7 +21,7 @@ class VcardRequest extends FormRequest
         $vcard = $this->route('vcard');
         $vcardId = $vcard ? $vcard->id : null;
         $photoRule = $this->isMethod('post') ? 'required' : 'nullable';
-        $reservedSlugs = ['login', 'logout', 'register', 'dashboard', 'vcards', 'rgstr-user', 'api', 'storage', 'assets', 'up'];
+        $reservedSlugs = ['login', 'logout', 'register', 'dashboard', 'vcards', 'users', 'rgstr-user', 'api', 'storage', 'assets', 'up'];
 
         return [
             'photo' => [$photoRule, 'image', 'mimes:webp,jpg,jpeg,png', 'max:4096'],

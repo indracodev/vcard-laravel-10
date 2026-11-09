@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Enums\UserRole;
 use App\Enums\VcardStatus;
 use App\Helpers\VcardHelper;
 use App\Models\Vcard;
@@ -15,6 +16,14 @@ class ExampleTest extends TestCase
         $this->assertSame('text-bg-success', VcardStatus::Active->badgeClass());
         $this->assertSame('Tidak Aktif', VcardStatus::Inactive->label());
         $this->assertSame('text-bg-danger', VcardStatus::Inactive->badgeClass());
+    }
+
+    public function test_user_role_enum_labels_and_badges(): void
+    {
+        $this->assertSame('Administrator', UserRole::Admin->label());
+        $this->assertSame('text-bg-primary', UserRole::Admin->badgeClass());
+        $this->assertSame('Tim HCS', UserRole::Hcs->label());
+        $this->assertSame('text-bg-secondary', UserRole::Hcs->badgeClass());
     }
 
     public function test_vcard_helper_builds_valid_vcf_content(): void

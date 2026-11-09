@@ -30,6 +30,21 @@
 
             <div class="d-flex align-items-center gap-2">
                @include('layouts.partials.themeSwitcher')
+               @if ((auth()->user() && auth()->user()->isAdmin()) || session('role') === 'admin')
+                  @if (request()->routeIs('users.*'))
+                     <a href="{{ route('dashboard') }}"
+                        class="btn btn-sm btn-primary d-flex align-items-center gap-2 bg-gradient">
+                        <i class="bi bi-grid" aria-hidden="true"></i>
+                        <span>DASHBOARD</span>
+                     </a>
+                  @else
+                     <a href="{{ route('users.index') }}"
+                        class="btn btn-sm btn-primary d-flex align-items-center gap-2 bg-gradient">
+                        <i class="bi bi-people" aria-hidden="true"></i>
+                        <span>MANAJEMEN AKUN</span>
+                     </a>
+                  @endif
+               @endif
                <form action="{{ route('logout') }}" method="POST" class="m-0">
                   @csrf
                   <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-2 bg-gradient">

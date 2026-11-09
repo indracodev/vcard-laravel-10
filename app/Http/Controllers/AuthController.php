@@ -39,6 +39,7 @@ class AuthController extends Controller
         Session::put('login', true);
         Session::put('user_id', $user->id);
         Session::put('username', $user->name);
+        Session::put('role', $user->role->value);
 
         return redirect('/dashboard');
     }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VcardController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,7 +21,15 @@ Route::middleware('checklogin')->group(function () {
     Route::get('/dashboard', [VcardController::class, 'index'])->name('dashboard');
     Route::post('/vcards', [VcardController::class, 'create'])->name('vcards.store');
     Route::put('/vcards/{vcard}', [VcardController::class, 'update'])->name('vcards.update');
-    Route::delete('/vcards/{vcard}', [VcardController::class, 'destroy'])->name('vcards.destroy');
+
+    Route::middleware('admin')->group(function () {
+        Route::delete('/vcards/{vcard}', [VcardController::class, 'destroy'])->name('vcards.destroy');
+
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
 });
 
 Route::get('/{link_name}/vcf', [VcardController::class, 'downloadVcf'])->name('vcards.vcf');

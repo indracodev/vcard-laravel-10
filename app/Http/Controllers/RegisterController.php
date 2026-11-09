@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,10 +12,22 @@ class RegisterController extends Controller
 {
     public function showRegister()
     {
+        $userCount = User::count();
         $isAuthenticated = Auth::check() || Session::get('login');
 
-        if (! $isAuthenticated && User::count() > 0) {
+        if (! $isAuthenticated && $userCount > 0) {
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu untuk mendaftarkan akun baru.');
+        }
+
+        if ($isAuthenticated) {
+            $user = Auth::user();
+            $isAdmin = ($user && $user->isAdmin()) || Session::get('role') === 'admin';
+
+            if (! $isAdmin) {
+                return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya Administrator yang dapat mendaftarkan akun baru.');
+            }
+
+            return redirect()->route('users.index');
         }
 
         return view('auth.register');
@@ -22,10 +35,20 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
+        $userCount = User::count();
         $isAuthenticated = Auth::check() || Session::get('login');
 
-        if (! $isAuthenticated && User::count() > 0) {
+        if (! $isAuthenticated && $userCount > 0) {
             return redirect()->route('login')->with('error', 'Akses ditolak. Silakan login terlebih dahulu.');
+        }
+
+        if ($isAuthenticated) {
+            $currentUser = Auth::user();
+            $isAdmin = ($currentUser && $currentUser->isAdmin()) || Session::get('role') === 'admin';
+
+            if (! $isAdmin) {
+                return redirect()->route('dashboard')->with('error', 'Akses ditolak. Hanya Administrator yang dapat mendaftarkan akun baru.');
+            }
         }
 
         $validated = $request->validate([
@@ -43,7 +66,8 @@ class RegisterController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        // Password otomatis di-hash melalui cast 'password' => 'hashed' pada model User
+        $validated['role'] = $userCount === 0 ? UserRole::Admin->value : UserRole::Hcs->value;
+
         $user = User::create($validated);
 
         if (! $isAuthenticated) {
@@ -53,6 +77,7 @@ class RegisterController extends Controller
                 'login' => true,
                 'user_id' => $user->id,
                 'username' => $user->name,
+                'role' => $user->role->value,
             ]);
         }
 

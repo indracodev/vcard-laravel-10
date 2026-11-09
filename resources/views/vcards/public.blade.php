@@ -26,10 +26,10 @@
             data-img-theme-light="{{ asset('assets/img/logo-indraco.png') }}"
             data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}"
             alt="Logo INDRACO" loading="lazy" class="mx-auto" style="width: 45%; height: auto;">
-         <div class="ratio ratio-1x1 rounded-circle overflow-hidden mx-auto bg-secondary" style="width:60%;">
+         <div class="ratio ratio-1x1 rounded-circle overflow-hidden mx-auto{{ $vcard->photo_url ? '' : ' bg-secondary' }}" style="width:60%;">
             @if ($vcard->photo_url)
                <img src="{{ $vcard->photo_url }}" alt="Foto {{ $vcard->full_name }}"
-                  loading="lazy" class="w-100 h-100 object-fit-cover">
+                  loading="lazy" class="w-100 h-100 object-fit-cover rounded-circle">
             @else
                <img src="{{ asset('assets/img/no-image-invert.png') }}" alt="Avatar default {{ $vcard->full_name }}" loading="lazy"
                   class="w-50 h-50 top-50 start-50 translate-middle">

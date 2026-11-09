@@ -28,24 +28,45 @@
                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
             </div>
          @endif
+         @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
+               {{ session('error') }}
+               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+            </div>
+         @endif
          <div class="row row-gap-4">
             <div class="col col-12 position-sticky top-0 z-3">
                <div class="card bg-body-tertiary shadow">
                   <div class="card-body">
                      <div class="row row-gap-3 justify-content-between">
                         <div class="col col-12 col-md">
-                           <form id="searchForm" class="input-group" method="GET" action="{{ route('dashboard') }}"
-                              role="search">
+                           <form id="searchForm" method="GET" action="{{ route('dashboard') }}" role="search">
                               <label for="searchInput" class="visually-hidden">Cari vCard</label>
-                              <span class="input-group-text">
-                                 <i class="bi bi-search" aria-hidden="true"></i>
-                              </span>
-                              <input type="search" id="searchInput" name="search" value="{{ request('search') }}"
-                                 class="form-control" placeholder="Cari nama, jabatan, email, telp" aria-label="Cari vCard"
-                                 autocomplete="off">
+                              <div class="input-group">
+                                 <span class="input-group-text">
+                                    <i class="bi bi-search" aria-hidden="true"></i>
+                                 </span>
+                                 <input type="search" id="searchInput" name="search" value="{{ request('search') }}"
+                                    class="form-control" placeholder="Cari nama, jabatan, email, telp"
+                                    aria-label="Cari vCard" autocomplete="off">
+                              </div>
                            </form>
                         </div>
-                        <div class="col col-12 col-md-auto">
+                        <div class="col col-12 col-sm-6 col-md-auto">
+                           <label for="sortSelect" class="visually-hidden">Urutkan vCard</label>
+                           <div class="input-group">
+                              <span class="input-group-text">
+                                 <i class="bi bi-sort-down" aria-hidden="true"></i>
+                              </span>
+                              <select id="sortSelect" name="sort" class="form-select" aria-label="Urutkan vCard">
+                                 <option value="newest" @selected(request('sort', 'newest') === 'newest')>Terbaru</option>
+                                 <option value="oldest" @selected(request('sort') === 'oldest')>Terlama</option>
+                                 <option value="name_asc" @selected(request('sort') === 'name_asc')>Abjad (A &ndash; Z)</option>
+                                 <option value="name_desc" @selected(request('sort') === 'name_desc')>Abjad (Z &ndash; A)</option>
+                              </select>
+                           </div>
+                        </div>
+                        <div class="col col-12 col-sm-6 col-md-auto">
                            <button type="button" id="btnAdd"
                               class="btn btn-primary bg-gradient w-100 d-flex align-items-center justify-content-center gap-2"
                               data-bs-toggle="modal" data-bs-target="#vcardModal">
@@ -87,15 +108,18 @@
                                ]),
                            );
                         @endphp
-                        <li class="vcard-item" data-search="{{ $searchableText }}">
+                        <li class="vcard-item" data-search="{{ $searchableText }}"
+                           data-sort-name="{{ mb_strtolower($v->full_name) }}"
+                           data-sort-time="{{ $v->created_at?->timestamp ?? 0 }}"
+                           data-sort-id="{{ $v->id }}">
                            <article class="card shadow-sm h-100 position-relative shadow">
                               <div class="card-body p-4 text-center">
 
                                  <div
-                                    class="ratio ratio-1x1 overflow-hidden rounded-circle w-50 mx-auto my-4 bg-secondary">
+                                    class="ratio ratio-1x1 overflow-hidden rounded-circle w-50 mx-auto my-4{{ $photoUrl ? '' : ' bg-secondary' }}">
                                     @if ($photoUrl)
                                        <img src="{{ $photoUrl }}" width="100" height="100"
-                                          alt="Foto {{ $v->full_name }}" class="object-fit-cover" loading="lazy">
+                                          alt="Foto {{ $v->full_name }}" class="object-fit-cover rounded-circle" loading="lazy">
                                     @else
                                        <img src="{{ asset('assets/img/no-image-invert.png') }}"
                                           alt="Avatar default {{ $v->full_name }}"
@@ -120,6 +144,7 @@
                                  <button type="button"
                                     class="btn btn-lg rounded-0 border-0 shadow-none position-absolute top-0 end-0 btnEdit"
                                     data-id="{{ $v->id }}" data-update-url="{{ route('vcards.update', $v->id) }}"
+                                    data-delete-url="{{ route('vcards.destroy', $v->id) }}"
                                     data-name="{{ $v->name }}" data-full_name="{{ $v->full_name }}"
                                     data-title="{{ $v->title }}" data-email="{{ $v->email }}"
                                     data-mobile_phone="{{ $v->mobile_phone }}" data-link_name="{{ $v->link_name }}"
@@ -184,11 +209,13 @@
                </div>
                <div class="form-group">
                   <label for="name" class="form-label small">Nama Panggilan / Singkat</label>
-                  <input type="text" name="name" id="name" class="form-control" autocomplete="nickname" required>
+                  <input type="text" name="name" id="name" class="form-control" autocomplete="nickname"
+                     required>
                </div>
                <div class="form-group">
                   <label for="full_name" class="form-label small">Nama Lengkap</label>
-                  <input type="text" name="full_name" id="full_name" class="form-control" autocomplete="name" required>
+                  <input type="text" name="full_name" id="full_name" class="form-control" autocomplete="name"
+                     required>
                </div>
                <div class="form-group">
                   <label for="status" class="form-label small">Status</label>
@@ -200,12 +227,13 @@
                </div>
                <div class="form-group">
                   <label for="title" class="form-label small">Jabatan</label>
-                  <input type="text" name="title" id="title" class="form-control" autocomplete="organization-title"
-                     required>
+                  <input type="text" name="title" id="title" class="form-control"
+                     autocomplete="organization-title" required>
                </div>
                <div class="form-group">
                   <label for="email" class="form-label small">Email</label>
-                  <input type="email" name="email" id="email" class="form-control" autocomplete="email" required>
+                  <input type="email" name="email" id="email" class="form-control" autocomplete="email"
+                     required>
                </div>
                <div class="form-group">
                   <label for="mobile_phone" class="form-label small">Nomor HP</label>
@@ -214,12 +242,16 @@
                </div>
                <div class="form-group">
                   <label for="link_name" class="form-label small">Link Name</label>
-                  <input type="text" name="link_name" id="link_name" class="form-control" autocomplete="off" required>
+                  <input type="text" name="link_name" id="link_name" class="form-control" autocomplete="off"
+                     required>
                </div>
             </div>
 
             <div class="modal-footer flex-nowrap bg-body-tertiary">
-               <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">Batal</button>
+               <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Batal</button>
+               @if ((auth()->user() && auth()->user()->isAdmin()) || session('role') === 'admin')
+                  <button type="button" class="btn btn-danger w-100 d-none" id="btnDeleteVcard">Hapus</button>
+               @endif
                <button type="submit" class="btn btn-success w-100" id="btnSubmit">Simpan</button>
             </div>
          </form>
@@ -231,6 +263,7 @@
       document.addEventListener('DOMContentLoaded', function() {
          const searchForm = document.getElementById('searchForm');
          const searchInput = document.getElementById('searchInput');
+         const sortSelect = document.getElementById('sortSelect');
          const vcardList = document.getElementById('vcard-list');
          const vcardItems = Array.from(document.querySelectorAll('.vcard-item'));
          const searchEmptyState = document.getElementById('searchEmptyState');
@@ -251,7 +284,11 @@
             paginationWrapper.classList.remove('d-none');
             vcardPagination.innerHTML = '';
 
-            const createPageItem = (label, targetPage, { disabled = false, active = false, ariaLabel = '' } = {}) => {
+            const createPageItem = (label, targetPage, {
+               disabled = false,
+               active = false,
+               ariaLabel = ''
+            } = {}) => {
                const li = document.createElement('li');
                li.className = `page-item${disabled ? ' disabled' : ''}${active ? ' active' : ''}`;
 
@@ -266,7 +303,10 @@
                   btn.addEventListener('click', () => {
                      currentPage = targetPage;
                      filterVcards(false);
-                     vcardList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                     vcardList.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                     });
                   });
                }
 
@@ -302,6 +342,8 @@
             if (!vcardList) return;
 
             const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const sortBy = sortSelect ? sortSelect.value : 'newest';
+
             if (resetPage) {
                currentPage = 1;
             }
@@ -311,6 +353,25 @@
                return query === '' || haystack.includes(query);
             });
 
+            matchedItems.sort((a, b) => {
+               if (sortBy === 'name_asc' || sortBy === 'name_desc') {
+                  const nameA = a.dataset.sortName || '';
+                  const nameB = b.dataset.sortName || '';
+                  const cmp = nameA.localeCompare(nameB, 'id');
+                  return sortBy === 'name_asc' ? cmp : -cmp;
+               }
+
+               const timeA = parseInt(a.dataset.sortTime || '0', 10);
+               const timeB = parseInt(b.dataset.sortTime || '0', 10);
+               if (timeA !== timeB) {
+                  return sortBy === 'oldest' ? timeA - timeB : timeB - timeA;
+               }
+
+               const idA = parseInt(a.dataset.sortId || '0', 10);
+               const idB = parseInt(b.dataset.sortId || '0', 10);
+               return sortBy === 'oldest' ? idA - idB : idB - idA;
+            });
+
             const totalMatches = matchedItems.length;
             const totalPages = Math.max(1, Math.ceil(totalMatches / ITEMS_PER_PAGE));
             if (currentPage > totalPages) {
@@ -318,7 +379,10 @@
             }
 
             const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-            const visibleSet = new Set(matchedItems.slice(startIndex, startIndex + ITEMS_PER_PAGE));
+            const pageItems = matchedItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+            const visibleSet = new Set(pageItems);
+
+            pageItems.forEach(item => vcardList.appendChild(item));
 
             vcardItems.forEach(item => {
                item.classList.toggle('d-none', !visibleSet.has(item));
@@ -338,6 +402,12 @@
                url.searchParams.delete('search');
             }
 
+            if (sortBy && sortBy !== 'newest') {
+               url.searchParams.set('sort', sortBy);
+            } else {
+               url.searchParams.delete('sort');
+            }
+
             if (currentPage > 1 && totalPages > 1) {
                url.searchParams.set('page', String(currentPage));
             } else {
@@ -355,24 +425,35 @@
             searchInput.addEventListener('search', () => filterVcards(true));
          }
 
+         if (sortSelect) {
+            sortSelect.addEventListener('change', () => filterVcards(true));
+         }
+
          filterVcards(false);
 
          const form = document.getElementById('vcardForm');
          const modalTitle = document.getElementById('vcardModalLabel');
          const methodInput = document.getElementById('formMethod');
+         const editPhotoContainer = document.getElementById('editPhoto');
          const photoPreview = document.getElementById('photoPreview');
          const photoInput = document.getElementById('photoInput');
          const statusSelect = document.getElementById('status');
          const btnSubmit = document.getElementById('btnSubmit');
+         const btnDeleteVcard = document.getElementById('btnDeleteVcard');
          const generalError = document.getElementById('formGeneralError');
          const defaultPhotoUrl = '{{ asset('assets/img/no-image-invert.png') }}';
          let currentObjectUrl = null;
          let initialPhotoUrl = '';
+         let currentDeleteUrl = '';
+         let currentVcardName = '';
 
          const setPhotoPreview = (src, isCustomPhoto) => {
             photoPreview.src = src || defaultPhotoUrl;
+            if (editPhotoContainer) {
+               editPhotoContainer.classList.toggle('bg-secondary', !isCustomPhoto);
+            }
             if (isCustomPhoto) {
-               photoPreview.className = 'object-fit-cover';
+               photoPreview.className = 'object-fit-cover rounded-circle';
             } else {
                photoPreview.className = 'w-50 h-50 top-50 start-50 translate-middle';
             }
@@ -418,6 +499,11 @@
             form.reset();
             photoInput.required = true;
             initialPhotoUrl = '';
+            currentDeleteUrl = '';
+            currentVcardName = '';
+            if (btnDeleteVcard) {
+               btnDeleteVcard.classList.add('d-none');
+            }
             setPhotoPreview(defaultPhotoUrl, false);
             statusSelect.value = '1';
             clearErrors();
@@ -427,12 +513,17 @@
             btn.addEventListener('click', () => {
                const id = btn.dataset.id;
                form.action = btn.dataset.updateUrl || `{{ url('/vcards') }}/${id}`;
+               currentDeleteUrl = btn.dataset.deleteUrl || `{{ url('/vcards') }}/${id}`;
+               currentVcardName = btn.dataset.full_name || '';
                methodInput.value = 'PUT';
                modalTitle.innerText = 'Edit {{ config('app.name') }}';
 
                form.reset();
                photoInput.required = false;
                clearErrors();
+               if (btnDeleteVcard) {
+                  btnDeleteVcard.classList.remove('d-none');
+               }
 
                document.getElementById('name').value = btn.dataset.name || '';
                document.getElementById('full_name').value = btn.dataset.full_name || '';
@@ -450,6 +541,53 @@
                }
             });
          });
+
+         if (btnDeleteVcard) {
+            btnDeleteVcard.addEventListener('click', function() {
+               if (!currentDeleteUrl) return;
+               if (!confirm(`Apakah Anda yakin ingin menghapus vCard "${currentVcardName}" secara permanen?`)) {
+                  return;
+               }
+
+               btnDeleteVcard.disabled = true;
+               btnSubmit.disabled = true;
+               clearErrors();
+
+               fetch(currentDeleteUrl, {
+                     method: 'DELETE',
+                     headers: {
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json'
+                     }
+                  })
+                  .then(async res => {
+                     const contentType = res.headers.get('content-type');
+                     if (contentType && contentType.includes('application/json')) {
+                        return res.json();
+                     }
+                     throw new Error('Respon server tidak valid (' + res.status + ')');
+                  })
+                  .then(data => {
+                     btnDeleteVcard.disabled = false;
+                     btnSubmit.disabled = false;
+
+                     if (data.success) {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('vcardModal'));
+                        if (modal) modal.hide();
+                        location.reload();
+                     } else if (data.errors && data.errors.general) {
+                        generalError.innerText = Array.isArray(data.errors.general) ? data.errors.general[0] : data.errors.general;
+                        generalError.classList.remove('d-none');
+                     }
+                  })
+                  .catch(err => {
+                     btnDeleteVcard.disabled = false;
+                     btnSubmit.disabled = false;
+                     generalError.innerText = err.message || 'Terjadi kesalahan saat menghapus data.';
+                     generalError.classList.remove('d-none');
+                  });
+            });
+         }
 
          form.addEventListener('submit', function(e) {
             e.preventDefault();

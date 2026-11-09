@@ -29,7 +29,21 @@ class ExampleTest extends TestCase
 
     public function test_dashboard_is_accessible_when_authenticated(): void
     {
-        $response = $this->withSession(['login' => true])->get('/dashboard');
+        $response = $this->withSession(['login' => true, 'role' => 'hcs'])->get('/dashboard');
+
+        $response->assertStatus(200);
+    }
+
+    public function test_users_management_is_forbidden_for_hcs_role(): void
+    {
+        $response = $this->withSession(['login' => true, 'role' => 'hcs'])->get('/users');
+
+        $response->assertRedirect('/dashboard');
+    }
+
+    public function test_users_management_is_accessible_for_admin_role(): void
+    {
+        $response = $this->withSession(['login' => true, 'role' => 'admin'])->get('/users');
 
         $response->assertStatus(200);
     }
