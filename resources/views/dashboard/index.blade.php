@@ -34,13 +34,14 @@
                   <div class="card-body">
                      <div class="row row-gap-3 justify-content-between">
                         <div class="col col-12 col-md">
-                           <form id="searchForm" class="input-group" method="GET" action="{{ route('dashboard') }}" role="search">
+                           <form id="searchForm" class="input-group" method="GET" action="{{ route('dashboard') }}"
+                              role="search">
                               <span class="input-group-text">
                                  <i class="bi bi-search" aria-hidden="true"></i>
                               </span>
                               <input type="search" id="searchInput" name="search" value="{{ request('search') }}"
-                                 class="form-control" placeholder="Cari nama, jabatan, email, telp"
-                                 aria-label="Cari vCard" autocomplete="off">
+                                 class="form-control" placeholder="Cari nama, jabatan, email, telp" aria-label="Cari vCard"
+                                 autocomplete="off">
                            </form>
                         </div>
                         <div class="col col-12 col-md-auto">
@@ -58,31 +59,31 @@
 
             <div class="col col-12">
                @if ($vcards->isEmpty())
-                  <div class="card shadow-sm">
-                     <div class="card-body p-5 text-center text-muted">
-                        Belum ada data vCard yang ditemukan.
-                     </div>
+                  <div class="alert alert-danger p-5 fs-5 text-center" role="alert">
+                     <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>
+                     <small>Belum ada data vCard yang ditemukan.</small>
                   </div>
                @else
-                  <div id="searchEmptyState" class="card shadow-sm d-none">
-                     <div class="card-body p-5 text-center text-muted">
-                        Tidak ada data vCard yang cocok dengan pencarian Anda.
-                     </div>
+                  <div id="searchEmptyState" class="alert alert-danger p-5 fs-5 text-center d-none" role="alert">
+                     <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>
+                     <span>Tidak ada data vCard yang cocok dengan pencarian Anda.</span>
                   </div>
                   <ul id="vcard-list" class="list-unstyled">
                      @foreach ($vcards as $v)
                         @php
                            $photoUrl = $v->photo_url;
                            $formattedPhone = formatPhone($v->mobile_phone);
-                           $searchableText = mb_strtolower(implode(' ', [
-                              $v->name,
-                              $v->full_name,
-                              $v->title,
-                              $v->email,
-                              $v->mobile_phone,
-                              $formattedPhone,
-                              $v->link_name,
-                           ]));
+                           $searchableText = mb_strtolower(
+                               implode(' ', [
+                                   $v->name,
+                                   $v->full_name,
+                                   $v->title,
+                                   $v->email,
+                                   $v->mobile_phone,
+                                   $formattedPhone,
+                                   $v->link_name,
+                               ]),
+                           );
                         @endphp
                         <li class="vcard-item" data-search="{{ $searchableText }}">
                            <article class="card shadow-sm h-100 position-relative shadow">
@@ -109,8 +110,7 @@
                                  <p class="mb-1 small">{{ $v->email }}</p>
                                  <p class="mb-2 small">{{ $formattedPhone }}</p>
                                  <div>
-                                    <span
-                                       class="badge rounded-pill {{ $v->status->badgeClass() }}">
+                                    <span class="badge rounded-pill {{ $v->status->badgeClass() }}">
                                        {{ $v->status->label() }}
                                     </span>
                                  </div>
@@ -121,10 +121,9 @@
                                     data-name="{{ $v->name }}" data-full_name="{{ $v->full_name }}"
                                     data-title="{{ $v->title }}" data-email="{{ $v->email }}"
                                     data-mobile_phone="{{ $v->mobile_phone }}" data-link_name="{{ $v->link_name }}"
-                                    data-photo="{{ $v->photo }}"
-                                    data-photo-url="{{ $photoUrl ?? '' }}"
-                                    data-status="{{ $v->status->value }}" data-bs-toggle="modal" data-bs-target="#vcardModal"
-                                    title="Edit Vcard">
+                                    data-photo="{{ $v->photo }}" data-photo-url="{{ $photoUrl ?? '' }}"
+                                    data-status="{{ $v->status->value }}" data-bs-toggle="modal"
+                                    data-bs-target="#vcardModal" title="Edit Vcard">
                                     <i class="bi bi-pencil-square" aria-hidden="true"></i>
                                     <span class="visually-hidden">Edit</span>
                                  </button>
@@ -141,6 +140,9 @@
                         </li>
                      @endforeach
                   </ul>
+                  <nav id="paginationWrapper" aria-label="Navigasi halaman vCard" class="mt-4 d-none">
+                     <ul id="vcardPagination" class="pagination justify-content-center flex-wrap mb-0"></ul>
+                  </nav>
                @endif
             </div>
          </div>
@@ -224,32 +226,116 @@
          const searchForm = document.getElementById('searchForm');
          const searchInput = document.getElementById('searchInput');
          const vcardList = document.getElementById('vcard-list');
-         const vcardItems = document.querySelectorAll('.vcard-item');
+         const vcardItems = Array.from(document.querySelectorAll('.vcard-item'));
          const searchEmptyState = document.getElementById('searchEmptyState');
+         const paginationWrapper = document.getElementById('paginationWrapper');
+         const vcardPagination = document.getElementById('vcardPagination');
+         const ITEMS_PER_PAGE = 20;
+         let currentPage = Math.max(1, parseInt(new URL(window.location.href).searchParams.get('page'), 10) || 1);
 
-         const filterVcards = () => {
-            if (!searchInput || !vcardList) return;
+         const renderPagination = (totalPages) => {
+            if (!paginationWrapper || !vcardPagination) return;
 
-            const query = searchInput.value.trim().toLowerCase();
-            let visibleCount = 0;
+            if (totalPages <= 1) {
+               paginationWrapper.classList.add('d-none');
+               vcardPagination.innerHTML = '';
+               return;
+            }
+
+            paginationWrapper.classList.remove('d-none');
+            vcardPagination.innerHTML = '';
+
+            const createPageItem = (label, targetPage, { disabled = false, active = false, ariaLabel = '' } = {}) => {
+               const li = document.createElement('li');
+               li.className = `page-item${disabled ? ' disabled' : ''}${active ? ' active' : ''}`;
+
+               const btn = document.createElement('button');
+               btn.type = 'button';
+               btn.className = 'page-link';
+               btn.innerHTML = label;
+               if (ariaLabel) btn.setAttribute('aria-label', ariaLabel);
+               if (active) btn.setAttribute('aria-current', 'page');
+
+               if (!disabled && !active) {
+                  btn.addEventListener('click', () => {
+                     currentPage = targetPage;
+                     filterVcards(false);
+                     vcardList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  });
+               }
+
+               li.appendChild(btn);
+               return li;
+            };
+
+            vcardPagination.appendChild(
+               createPageItem('&laquo; Sebelumnya', currentPage - 1, {
+                  disabled: currentPage === 1,
+                  ariaLabel: 'Halaman sebelumnya'
+               })
+            );
+
+            for (let page = 1; page <= totalPages; page++) {
+               vcardPagination.appendChild(
+                  createPageItem(String(page), page, {
+                     active: page === currentPage,
+                     ariaLabel: `Halaman ${page}`
+                  })
+               );
+            }
+
+            vcardPagination.appendChild(
+               createPageItem('Selanjutnya &raquo;', currentPage + 1, {
+                  disabled: currentPage === totalPages,
+                  ariaLabel: 'Halaman selanjutnya'
+               })
+            );
+         };
+
+         const filterVcards = (resetPage = true) => {
+            if (!vcardList) return;
+
+            const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            if (resetPage) {
+               currentPage = 1;
+            }
+
+            const matchedItems = vcardItems.filter(item => {
+               const haystack = item.dataset.search || '';
+               return query === '' || haystack.includes(query);
+            });
+
+            const totalMatches = matchedItems.length;
+            const totalPages = Math.max(1, Math.ceil(totalMatches / ITEMS_PER_PAGE));
+            if (currentPage > totalPages) {
+               currentPage = totalPages;
+            }
+
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const visibleSet = new Set(matchedItems.slice(startIndex, startIndex + ITEMS_PER_PAGE));
 
             vcardItems.forEach(item => {
-               const haystack = item.dataset.search || '';
-               const isMatch = query === '' || haystack.includes(query);
-               item.classList.toggle('d-none', !isMatch);
-               if (isMatch) visibleCount++;
+               item.classList.toggle('d-none', !visibleSet.has(item));
             });
 
             if (searchEmptyState) {
-               searchEmptyState.classList.toggle('d-none', visibleCount > 0);
+               searchEmptyState.classList.toggle('d-none', totalMatches > 0);
             }
-            vcardList.classList.toggle('d-none', visibleCount === 0);
+            vcardList.classList.toggle('d-none', totalMatches === 0);
+
+            renderPagination(totalPages);
 
             const url = new URL(window.location.href);
-            if (query !== '') {
+            if (query !== '' && searchInput) {
                url.searchParams.set('search', searchInput.value.trim());
             } else {
                url.searchParams.delete('search');
+            }
+
+            if (currentPage > 1 && totalPages > 1) {
+               url.searchParams.set('page', String(currentPage));
+            } else {
+               url.searchParams.delete('page');
             }
             window.history.replaceState({}, '', url);
          };
@@ -257,15 +343,13 @@
          if (searchForm && searchInput) {
             searchForm.addEventListener('submit', function(e) {
                e.preventDefault();
-               filterVcards();
+               filterVcards(true);
             });
-            searchInput.addEventListener('input', filterVcards);
-            searchInput.addEventListener('search', filterVcards);
-
-            if (searchInput.value.trim() !== '') {
-               filterVcards();
-            }
+            searchInput.addEventListener('input', () => filterVcards(true));
+            searchInput.addEventListener('search', () => filterVcards(true));
          }
+
+         filterVcards(false);
 
          const form = document.getElementById('vcardForm');
          const modalTitle = document.getElementById('vcardModalLabel');
