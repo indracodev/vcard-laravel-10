@@ -15,10 +15,9 @@ use Intervention\Image\ImageManager;
 
 class VcardController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $vcards = Vcard::query()
-            ->search($request->input('search'))
             ->latest()
             ->get();
 

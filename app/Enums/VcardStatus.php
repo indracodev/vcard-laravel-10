@@ -23,4 +23,3 @@ enum VcardStatus: int
         };
     }
 }
-

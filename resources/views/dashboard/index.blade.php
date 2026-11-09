@@ -34,15 +34,13 @@
                   <div class="card-body">
                      <div class="row row-gap-3 justify-content-between">
                         <div class="col col-12 col-md">
-                           <form class="input-group" method="GET" action="{{ route('dashboard') }}" role="search">
+                           <form id="searchForm" class="input-group" method="GET" action="{{ route('dashboard') }}" role="search">
                               <span class="input-group-text">
                                  <i class="bi bi-search" aria-hidden="true"></i>
                               </span>
-                              <input type="search" name="search" value="{{ request('search') }}" class="form-control"
-                                 placeholder="Cari nama, jabatan, email, telp" aria-label="Cari vCard">
-                              <button type="submit" class="btn border" aria-label="Cari">
-                                 Cari
-                              </button>
+                              <input type="search" id="searchInput" name="search" value="{{ request('search') }}"
+                                 class="form-control" placeholder="Cari nama, jabatan, email, telp"
+                                 aria-label="Cari vCard" autocomplete="off">
                            </form>
                         </div>
                         <div class="col col-12 col-md-auto">
@@ -66,12 +64,27 @@
                      </div>
                   </div>
                @else
+                  <div id="searchEmptyState" class="card shadow-sm d-none">
+                     <div class="card-body p-5 text-center text-muted">
+                        Tidak ada data vCard yang cocok dengan pencarian Anda.
+                     </div>
+                  </div>
                   <ul id="vcard-list" class="list-unstyled">
                      @foreach ($vcards as $v)
                         @php
                            $photoUrl = $v->photo_url;
+                           $formattedPhone = formatPhone($v->mobile_phone);
+                           $searchableText = mb_strtolower(implode(' ', [
+                              $v->name,
+                              $v->full_name,
+                              $v->title,
+                              $v->email,
+                              $v->mobile_phone,
+                              $formattedPhone,
+                              $v->link_name,
+                           ]));
                         @endphp
-                        <li>
+                        <li class="vcard-item" data-search="{{ $searchableText }}">
                            <article class="card shadow-sm h-100 position-relative shadow">
                               <div class="card-body p-4 text-center">
 
@@ -94,7 +107,7 @@
                                  <h2 class="fs-5 text-capitalize fw-medium mb-1">{{ $v->full_name }}</h2>
                                  <p class="text-capitalize small text-muted mb-2">{{ $v->title }}</p>
                                  <p class="mb-1 small">{{ $v->email }}</p>
-                                 <p class="mb-2 small">{{ formatPhone($v->mobile_phone) }}</p>
+                                 <p class="mb-2 small">{{ $formattedPhone }}</p>
                                  <div>
                                     <span
                                        class="badge rounded-pill {{ $v->status->badgeClass() }}">
@@ -208,6 +221,52 @@
 @push('scripts')
    <script>
       document.addEventListener('DOMContentLoaded', function() {
+         const searchForm = document.getElementById('searchForm');
+         const searchInput = document.getElementById('searchInput');
+         const vcardList = document.getElementById('vcard-list');
+         const vcardItems = document.querySelectorAll('.vcard-item');
+         const searchEmptyState = document.getElementById('searchEmptyState');
+
+         const filterVcards = () => {
+            if (!searchInput || !vcardList) return;
+
+            const query = searchInput.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            vcardItems.forEach(item => {
+               const haystack = item.dataset.search || '';
+               const isMatch = query === '' || haystack.includes(query);
+               item.classList.toggle('d-none', !isMatch);
+               if (isMatch) visibleCount++;
+            });
+
+            if (searchEmptyState) {
+               searchEmptyState.classList.toggle('d-none', visibleCount > 0);
+            }
+            vcardList.classList.toggle('d-none', visibleCount === 0);
+
+            const url = new URL(window.location.href);
+            if (query !== '') {
+               url.searchParams.set('search', searchInput.value.trim());
+            } else {
+               url.searchParams.delete('search');
+            }
+            window.history.replaceState({}, '', url);
+         };
+
+         if (searchForm && searchInput) {
+            searchForm.addEventListener('submit', function(e) {
+               e.preventDefault();
+               filterVcards();
+            });
+            searchInput.addEventListener('input', filterVcards);
+            searchInput.addEventListener('search', filterVcards);
+
+            if (searchInput.value.trim() !== '') {
+               filterVcards();
+            }
+         }
+
          const form = document.getElementById('vcardForm');
          const modalTitle = document.getElementById('vcardModalLabel');
          const methodInput = document.getElementById('formMethod');
