@@ -16,77 +16,79 @@
 </head>
 
 <body>
-   <div class="fixed-top p-3 d-flex justify-content-end z-2">
-      @include('layouts.partials.themeSwitcher')
-   </div>
-
-   <main class="w-100 z-1">
-      <div class="card shadow vstack">
-         <div class="card-header p-3 bg-primary-subtle bg-gradient">
-            <div class="text-center mb-1">
-               <img src="{{ asset('assets/img/logo-indraco.png') }}"
-                  data-img-theme-light="{{ asset('assets/img/logo-indraco.png') }}"
-                  data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}" alt="Logo INDRACO"
-                  height="32">
-            </div>
-            <h1 class="fs-6 text-center mb-0">
-               <small>INDRACO Vcard &ndash; Kartu Nama Digital</small>
-            </h1>
-         </div>
-         <div class="card-body flex-grow-1 overflow-x-hidden overflow-y-auto p-4">
-            @if (session('error'))
-               <div class="alert alert-danger small" role="alert">{{ session('error') }}</div>
-            @endif
-            @if ($errors->any())
-               <div class="alert alert-danger small" role="alert">
-                  <ul class="mb-0 ps-3">
-                     @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                     @endforeach
-                  </ul>
-               </div>
-            @endif
-            <form action="{{ url('/login') }}" method="POST" class="d-flex flex-column row-gap-3">
-               @csrf
-               <div>
-                  <label for="username" class="form-label fw-bold small">Akun Pengguna (Username)</label>
-                  <div class="input-group">
-                     <span class="input-group-text">
-                        <i class="bi bi-person" aria-hidden="true"></i>
-                     </span>
-                     <input type="text" name="username" id="username" value="{{ old('username') }}"
-                        class="form-control" placeholder="Username" autocomplete="username" required autofocus>
-                  </div>
-               </div>
-               <div>
-                  <label for="password" class="form-label fw-bold small">Kata Sandi (Password)</label>
-                  <div class="input-group">
-                     <span class="input-group-text">
-                        <i class="bi bi-lock" aria-hidden="true"></i>
-                     </span>
-                     <input type="password" name="password" id="password" class="form-control" placeholder="Password"
-                        autocomplete="current-password" required>
-                     <button type="button" class="btn btn-outline-secondary" id="togglePassword"
-                        aria-label="Tampilkan kata sandi" aria-pressed="false" aria-controls="password"
-                        title="Tampilkan kata sandi">
-                        <i class="bi bi-eye" id="togglePasswordIcon" aria-hidden="true"></i>
-                     </button>
-                  </div>
-               </div>
-               <button type="submit"
-                  class="btn btn-lg btn-primary bg-gradient w-100 mt-3 d-flex justify-content-center align-items-center gap-2">
-                  <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
-                  <span>LOGIN</span>
-               </button>
-            </form>
-         </div>
-         <div class="card-footer text-center small text-muted">
-            Dikembangkan dengan <span role="img" aria-label="cinta">❤️</span> oleh INDRACODEV. &copy;
-            {{ date('Y') }} <strong>{{ config('app.name') }}</strong>. Seluruh hak
-            dilindungi.
-         </div>
+   <div class="app-wrapper">
+      <div class="position-absolute top-0 end-0 p-2 p-md-3 z-2">
+         @include('layouts.partials.themeSwitcher')
       </div>
-   </main>
+
+      <main class="position-absolute top-50 start-50 translate-middle w-100 p-3 z-1">
+         <div class="card shadow vstack">
+            <div class="card-header p-3 bg-primary-subtle bg-gradient">
+               <div class="text-center mb-1">
+                  <img src="{{ asset('assets/img/logo-indraco.png') }}"
+                     data-img-theme-light="{{ asset('assets/img/logo-indraco.png') }}"
+                     data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}" alt="Logo INDRACO"
+                     height="32">
+               </div>
+               <h1 class="fs-6 text-center mb-0">
+                  <small>INDRACO Vcard &ndash; Kartu Nama Digital</small>
+               </h1>
+            </div>
+            <div class="card-body flex-grow-1 overflow-x-hidden overflow-y-auto p-4">
+               @if (session('error'))
+                  <div class="alert alert-danger small" role="alert">{{ session('error') }}</div>
+               @endif
+               @if ($errors->any())
+                  <div class="alert alert-danger small" role="alert">
+                     <ul class="mb-0 ps-3">
+                        @foreach ($errors->all() as $error)
+                           <li>{{ $error }}</li>
+                        @endforeach
+                     </ul>
+                  </div>
+               @endif
+               <form action="{{ url('/login') }}" method="POST" class="d-flex flex-column row-gap-3">
+                  @csrf
+                  <div>
+                     <label for="username" class="form-label fw-bold small">Akun Pengguna (Username)</label>
+                     <div class="input-group">
+                        <span class="input-group-text">
+                           <i class="bi bi-person" aria-hidden="true"></i>
+                        </span>
+                        <input type="text" name="username" id="username" value="{{ old('username') }}"
+                           class="form-control" placeholder="Username" autocomplete="username" required autofocus>
+                     </div>
+                  </div>
+                  <div>
+                     <label for="password" class="form-label fw-bold small">Kata Sandi (Password)</label>
+                     <div class="input-group">
+                        <span class="input-group-text">
+                           <i class="bi bi-lock" aria-hidden="true"></i>
+                        </span>
+                        <input type="password" name="password" id="password" class="form-control"
+                           placeholder="Password" autocomplete="current-password" required>
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword"
+                           aria-label="Tampilkan kata sandi" aria-pressed="false" aria-controls="password"
+                           title="Tampilkan kata sandi">
+                           <i class="bi bi-eye" id="togglePasswordIcon" aria-hidden="true"></i>
+                        </button>
+                     </div>
+                  </div>
+                  <button type="submit"
+                     class="btn btn-lg btn-primary bg-gradient w-100 mt-3 d-flex justify-content-center align-items-center gap-2">
+                     <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+                     <span>LOGIN</span>
+                  </button>
+               </form>
+            </div>
+            <div class="card-footer text-center small text-muted">
+               Dikembangkan dengan <span role="img" aria-label="cinta">❤️</span> oleh INDRACODEV. <br> &copy;
+               {{ date('Y') }} <strong>{{ config('app.name') }}</strong>. Seluruh hak
+               dilindungi.
+            </div>
+         </div>
+      </main>
+   </div>
 
    <script>
       document.addEventListener('DOMContentLoaded', function() {

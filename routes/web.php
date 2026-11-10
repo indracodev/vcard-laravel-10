@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VcardController;
 use Illuminate\Support\Facades\Route;
@@ -12,9 +11,6 @@ Route::get('/', function () {
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
-
-Route::get('/register', [RegisterController::class, 'showRegister'])->name('register');
-Route::post('/register', [RegisterController::class, 'register'])->middleware('throttle:5,1');
 
 Route::middleware('checklogin')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

@@ -7,7 +7,6 @@ use App\Helpers\VcardHelper;
 use App\Http\Requests\VcardRequest;
 use App\Models\Vcard;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
@@ -26,11 +25,7 @@ class VcardController extends Controller
 
     public function show(Request $request, string $link_name)
     {
-        $vcard = Cache::remember(
-            "vcard:{$link_name}",
-            now()->addHours(12),
-            fn () => Vcard::where('link_name', $link_name)->first()
-        );
+        $vcard = Vcard::where('link_name', $link_name)->first();
 
         if (! $vcard || $vcard->status === VcardStatus::Inactive) {
             return redirect()->away('https://indracoglobal.com');
@@ -40,9 +35,7 @@ class VcardController extends Controller
         $sessionKey = 'viewed_vcard_'.$vcard->id.'_'.md5((string) $ip);
 
         if (! Session::has($sessionKey)) {
-            Vcard::whereKey($vcard->id)->increment('views');
-            $vcard->views++;
-            Cache::put("vcard:{$link_name}", $vcard, now()->addHours(12));
+            $vcard->increment('views');
             Session::put($sessionKey, true);
         }
 
@@ -51,11 +44,7 @@ class VcardController extends Controller
 
     public function downloadVcf(string $link_name)
     {
-        $vcard = Cache::remember(
-            "vcard:{$link_name}",
-            now()->addHours(12),
-            fn () => Vcard::where('link_name', $link_name)->first()
-        );
+        $vcard = Vcard::where('link_name', $link_name)->first();
 
         if (! $vcard || $vcard->status === VcardStatus::Inactive) {
             return redirect()->away('https://indracoglobal.com');

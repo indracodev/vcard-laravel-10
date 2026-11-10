@@ -3,13 +3,13 @@
    Dashboard
 @endsection
 @section('content')
-   <section aria-label="Sambutan utama" style="padding: 125px 0;">
-      <div class="container-fluid px-lg-4 px-xxl-5">
+   <section aria-label="Sambutan utama" class="py-5 my-lg-4">
+      <div class="container-fluid px-3 px-lg-4 px-xxl-5">
          <div class="page-title text-center mx-auto" style="max-width: 640px;">
-            <h1 class="display-5 fw-bold mb-0">
+            <h1 class="display-6 display-md-5 fw-bold mb-2">
                Masa Depan Jejaring Bisnis Ada di Genggaman Anda.
             </h1>
-            <p class="lead">
+            <p class="lead fs-6 fs-md-5 mb-3">
                Tinggalkan kartu nama kertas. Bagikan profil profesional dan kontak bisnis Anda dalam satu ketukan dengan
                {{ config('app.name') }}.
             </p>
@@ -21,7 +21,7 @@
    </section>
 
    <section aria-label="Daftar vCard">
-      <div class="container-fluid px-lg-4 px-xxl-5">
+      <div class="container-fluid px-3 px-lg-4 px-xxl-5">
          @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert">
                {{ session('success') }}
@@ -34,11 +34,11 @@
                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
             </div>
          @endif
-         <div class="row row-gap-4">
+         <div class="row row-gap-3 row-gap-md-4">
             <div class="col col-12 position-sticky top-0 z-3">
                <div class="card bg-body-tertiary shadow">
-                  <div class="card-body">
-                     <div class="row row-gap-3 justify-content-between">
+                  <div class="card-body p-2 p-md-3">
+                     <div class="row g-2 g-md-3 align-items-center justify-content-between">
                         <div class="col col-12 col-md">
                            <form id="searchForm" method="GET" action="{{ route('dashboard') }}" role="search">
                               <label for="searchInput" class="visually-hidden">Cari vCard</label>
@@ -52,7 +52,7 @@
                               </div>
                            </form>
                         </div>
-                        <div class="col col-12 col-sm-6 col-md-auto">
+                        <div class="col col-6 col-md-auto">
                            <label for="sortSelect" class="visually-hidden">Urutkan vCard</label>
                            <div class="input-group">
                               <span class="input-group-text">
@@ -66,12 +66,13 @@
                               </select>
                            </div>
                         </div>
-                        <div class="col col-12 col-sm-6 col-md-auto">
+                        <div class="col col-6 col-md-auto">
                            <button type="button" id="btnAdd"
-                              class="btn btn-primary bg-gradient w-100 d-flex align-items-center justify-content-center gap-2"
+                              class="btn btn-primary bg-gradient w-100 d-flex align-items-center justify-content-center gap-1 gap-sm-2 text-truncate"
                               data-bs-toggle="modal" data-bs-target="#vcardModal">
                               <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                              <span>Tambah {{ config('app.name') }}</span>
+                              <span class="d-sm-none">Tambah</span>
+                              <span class="d-none d-sm-inline">Tambah {{ config('app.name') }}</span>
                            </button>
                         </div>
                      </div>
@@ -110,8 +111,7 @@
                         @endphp
                         <li class="vcard-item" data-search="{{ $searchableText }}"
                            data-sort-name="{{ mb_strtolower($v->full_name) }}"
-                           data-sort-time="{{ $v->created_at?->timestamp ?? 0 }}"
-                           data-sort-id="{{ $v->id }}">
+                           data-sort-time="{{ $v->created_at?->timestamp ?? 0 }}" data-sort-id="{{ $v->id }}">
                            <article class="card shadow-sm h-100 position-relative shadow">
                               <div class="card-body p-4 text-center">
 
@@ -119,7 +119,8 @@
                                     class="ratio ratio-1x1 overflow-hidden rounded-circle w-50 mx-auto my-4{{ $photoUrl ? '' : ' bg-secondary' }}">
                                     @if ($photoUrl)
                                        <img src="{{ $photoUrl }}" width="100" height="100"
-                                          alt="Foto {{ $v->full_name }}" class="object-fit-cover rounded-circle" loading="lazy">
+                                          alt="Foto {{ $v->full_name }}" class="object-fit-cover rounded-circle"
+                                          loading="lazy">
                                     @else
                                        <img src="{{ asset('assets/img/no-image-invert.png') }}"
                                           alt="Avatar default {{ $v->full_name }}"
@@ -143,7 +144,8 @@
 
                                  <button type="button"
                                     class="btn btn-lg rounded-0 border-0 shadow-none position-absolute top-0 end-0 btnEdit"
-                                    data-id="{{ $v->id }}" data-update-url="{{ route('vcards.update', $v->id) }}"
+                                    data-id="{{ $v->id }}"
+                                    data-update-url="{{ route('vcards.update', $v->id) }}"
                                     data-delete-url="{{ route('vcards.destroy', $v->id) }}"
                                     data-name="{{ $v->name }}" data-full_name="{{ $v->full_name }}"
                                     data-title="{{ $v->title }}" data-email="{{ $v->email }}"
@@ -203,22 +205,22 @@
                      <img id="photoPreview" src="{{ asset('assets/img/no-image-invert.png') }}" width="100"
                         height="100" alt="Pratinjau foto" class="w-50 h-50 top-50 start-50 translate-middle">
                   </div>
-                  <label for="photoInput" class="form-label small">Foto</label>
+                  <label for="photoInput" class="form-label fw-bold small">Foto</label>
                   <input type="file" name="photo" class="form-control" id="photoInput"
                      accept=".webp,.jpg,.jpeg,.png">
                </div>
                <div class="form-group">
-                  <label for="name" class="form-label small">Nama Panggilan / Singkat</label>
+                  <label for="name" class="form-label fw-bold small">Nama Panggilan / Singkat</label>
                   <input type="text" name="name" id="name" class="form-control" autocomplete="nickname"
                      required>
                </div>
                <div class="form-group">
-                  <label for="full_name" class="form-label small">Nama Lengkap</label>
+                  <label for="full_name" class="form-label fw-bold small">Nama Lengkap</label>
                   <input type="text" name="full_name" id="full_name" class="form-control" autocomplete="name"
                      required>
                </div>
                <div class="form-group">
-                  <label for="status" class="form-label small">Status</label>
+                  <label for="status" class="form-label fw-bold small">Status</label>
                   <select name="status" id="status" class="form-select">
                      @foreach (\App\Enums\VcardStatus::cases() as $statusCase)
                         <option value="{{ $statusCase->value }}">{{ $statusCase->label() }}</option>
@@ -226,22 +228,22 @@
                   </select>
                </div>
                <div class="form-group">
-                  <label for="title" class="form-label small">Jabatan</label>
+                  <label for="title" class="form-label fw-bold small">Jabatan</label>
                   <input type="text" name="title" id="title" class="form-control"
                      autocomplete="organization-title" required>
                </div>
                <div class="form-group">
-                  <label for="email" class="form-label small">Email</label>
+                  <label for="email" class="form-label fw-bold small">Email</label>
                   <input type="email" name="email" id="email" class="form-control" autocomplete="email"
                      required>
                </div>
                <div class="form-group">
-                  <label for="mobile_phone" class="form-label small">Nomor HP</label>
+                  <label for="mobile_phone" class="form-label fw-bold small">Nomor HP</label>
                   <input type="text" name="mobile_phone" id="mobile_phone" class="form-control"
                      placeholder="+62 812 3456 7890" autocomplete="tel" required>
                </div>
                <div class="form-group">
-                  <label for="link_name" class="form-label small">Link Name</label>
+                  <label for="link_name" class="form-label fw-bold small">Link Name</label>
                   <input type="text" name="link_name" id="link_name" class="form-control" autocomplete="off"
                      required>
                </div>
@@ -545,7 +547,8 @@
          if (btnDeleteVcard) {
             btnDeleteVcard.addEventListener('click', function() {
                if (!currentDeleteUrl) return;
-               if (!confirm(`Apakah Anda yakin ingin menghapus vCard "${currentVcardName}" secara permanen?`)) {
+               if (!confirm(
+                     `Apakah Anda yakin ingin menghapus vCard "${currentVcardName}" secara permanen?`)) {
                   return;
                }
 
@@ -576,7 +579,8 @@
                         if (modal) modal.hide();
                         location.reload();
                      } else if (data.errors && data.errors.general) {
-                        generalError.innerText = Array.isArray(data.errors.general) ? data.errors.general[0] : data.errors.general;
+                        generalError.innerText = Array.isArray(data.errors.general) ? data.errors.general[
+                           0] : data.errors.general;
                         generalError.classList.remove('d-none');
                      }
                   })

@@ -16,62 +16,68 @@
    <script src="{{ asset('assets/js/themeSwitcher.js') }}"></script>
 </head>
 
-<body class="p-0">
-   <header>
-      <nav class="navbar navbar-expand bg-primary-subtle bg-gradient border-bottom shadow" aria-label="Navigasi utama">
-         <div class="container-fluid flex-wrap column-gap-2 text-nowrap">
+<body>
+   <div class="app-wrapper">
+      <header>
+         <nav class="navbar navbar-expand bg-primary-subtle bg-gradient border-bottom shadow"
+            aria-label="Navigasi utama">
+            <div class="container-fluid flex-wrap column-gap-2 text-nowrap">
 
-            <a class="navbar-brand d-flex" href="{{ route('dashboard') }}"
-               aria-label="Beranda Dashboard {{ config('app.name') }}">
-               <img src="{{ asset('assets/img/logo-indraco.png') }}"
-                  data-img-theme-light="{{ asset('assets/img/logo-indraco.png') }}"
-                  data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}" alt="Logo INDRACO"
-                  class="w-100 h-auto d-inline-block align-text-top" style="max-width: 120px">
-            </a>
+               <a class="navbar-brand d-flex" href="{{ route('dashboard') }}"
+                  aria-label="Beranda Dashboard {{ config('app.name') }}">
+                  <img src="{{ asset('assets/img/logo-indraco.png') }}"
+                     data-img-theme-light="{{ asset('assets/img/logo-indraco.png') }}"
+                     data-img-theme-dark="{{ asset('assets/img/logo-indraco-invert.png') }}" alt="Logo INDRACO"
+                     class="w-100 h-auto d-inline-block align-text-top" style="max-width: 150px">
+               </a>
 
-            <div class="d-flex align-items-center gap-2">
-               @include('layouts.partials.themeSwitcher')
-               @if ((auth()->user() && auth()->user()->isAdmin()) || session('role') === 'admin')
-                  @if (request()->routeIs('users.*'))
-                     <a href="{{ route('dashboard') }}"
-                        class="btn btn-sm btn-primary d-flex align-items-center gap-2 bg-gradient">
-                        <i class="bi bi-grid" aria-hidden="true"></i>
-                        <span>DASHBOARD</span>
-                     </a>
-                  @else
-                     <a href="{{ route('users.index') }}"
-                        class="btn btn-sm btn-primary d-flex align-items-center gap-2 bg-gradient">
-                        <i class="bi bi-people" aria-hidden="true"></i>
-                        <span>MANAJEMEN AKUN</span>
-                     </a>
+               <div class="d-flex align-items-center gap-1 gap-sm-2">
+                  @include('layouts.partials.themeSwitcher')
+                  @if ((auth()->user() && auth()->user()->isAdmin()) || session('role') === 'admin')
+                     @if (request()->routeIs('users.*'))
+                        <a href="{{ route('dashboard') }}"
+                           class="btn btn-sm btn-primary d-flex align-items-center gap-2 bg-gradient"
+                           aria-label="Kembali ke Dashboard" title="Dashboard">
+                           <i class="bi bi-grid" aria-hidden="true"></i>
+                           <span class="d-none d-sm-inline">DASHBOARD</span>
+                        </a>
+                     @else
+                        <a href="{{ route('users.index') }}"
+                           class="btn btn-sm btn-primary d-flex align-items-center gap-2 bg-gradient"
+                           aria-label="Manajemen Akun" title="Manajemen Akun">
+                           <i class="bi bi-people" aria-hidden="true"></i>
+                           <span class="d-none d-sm-inline">MANAJEMEN AKUN</span>
+                        </a>
+                     @endif
                   @endif
-               @endif
-               <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="m-0">
-                  @csrf
-                  <input type="hidden" name="idle" id="logoutIdleInput" value="0">
-                  <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-2 bg-gradient">
-                     <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-                     <span>LOGOUT</span>
-                  </button>
-               </form>
-            </div>
+                  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="m-0">
+                     @csrf
+                     <input type="hidden" name="idle" id="logoutIdleInput" value="0">
+                     <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-2 bg-gradient"
+                        aria-label="Logout" title="Logout">
+                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                        <span class="d-none d-sm-inline">LOGOUT</span>
+                     </button>
+                  </form>
+               </div>
 
+            </div>
+         </nav>
+      </header>
+      <main>
+         @yield('content')
+      </main>
+      <footer class="py-3">
+         <div class="container-fluid px-lg-4 px-xxl-5">
+            <hr>
+            <p class="small text-center text-muted mb-0">
+               Dikembangkan dengan <span role="img" aria-label="cinta">❤️</span> oleh INDRACODEV. &copy;
+               {{ date('Y') }} <strong>{{ config('app.name') }}</strong>. Seluruh hak
+               dilindungi.
+            </p>
          </div>
-      </nav>
-   </header>
-   <main>
-      @yield('content')
-   </main>
-   <footer class="py-3">
-      <div class="container-fluid px-lg-4 px-xxl-5">
-         <hr>
-         <p class="small text-center text-muted mb-0">
-            Dikembangkan dengan <span role="img" aria-label="cinta">❤️</span> oleh INDRACODEV. &copy;
-            {{ date('Y') }} <strong>{{ config('app.name') }}</strong>. Seluruh hak
-            dilindungi.
-         </p>
-      </div>
-   </footer>
+      </footer>
+   </div>
 
    @stack('modals')
    @stack('scripts')

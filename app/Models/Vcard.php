@@ -6,7 +6,6 @@ use App\Enums\VcardStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
 
 #[Fillable([
     'photo',
@@ -26,22 +25,6 @@ class Vcard extends Model
             'status' => VcardStatus::class,
             'views' => 'integer',
         ];
-    }
-
-    protected static function booted(): void
-    {
-        static::saved(function (self $vcard): void {
-            Cache::forget("vcard:{$vcard->link_name}");
-
-            $originalLink = $vcard->getOriginal('link_name');
-            if ($originalLink && $originalLink !== $vcard->link_name) {
-                Cache::forget("vcard:{$originalLink}");
-            }
-        });
-
-        static::deleted(function (self $vcard): void {
-            Cache::forget("vcard:{$vcard->link_name}");
-        });
     }
 
     public function scopeSearch(Builder $query, ?string $search): Builder
